@@ -25,8 +25,10 @@ void wrn_tx_tstamp_skb(struct wrn_dev *wrn, int desc)
 	u32 counter_ppsg; /* PPS generator nanosecond counter */
 	u32 utc;
 
-	if (!wrn->skb_desc[desc].valid)
+	if (!wrn->skb_desc[desc].valid) {
+		printk("%s: no skb in slot %i\n", __func__, desc);
 		return;
+	}
 
 	/* already reported by hardware: do the timestamping magic */
 	wrn_ppsg_read_time(wrn, &counter_ppsg, &utc);
@@ -42,6 +44,8 @@ void wrn_tx_tstamp_skb(struct wrn_dev *wrn, int desc)
 		hwts->hwtstamp = timespec_to_ktime(ts);
 		skb_tstamp_tx(skb, hwts);
 	}
+	printk("%s: stamped slot %i, %x, %p\n", __func__, desc,
+	       d->frame_id, skb);
 	dev_kfree_skb_irq(skb);
 
 	/* release both the descriptor and the tstamp entry */
@@ -68,6 +72,7 @@ static int record_tstamp(struct wrn_dev *wrn, u32 tsval, u32 idreg, u32 r2)
 
 	if (i == WRN_NR_DESC) {
 		/* Not found: Must be a PTP frame sent from the SPEC! */
+		printk("%s: not found id %x\n", __func__, frame_id);
 		return 0;
 	}
 
@@ -87,6 +92,7 @@ static int record_tstamp(struct wrn_dev *wrn, u32 tsval, u32 idreg, u32 r2)
 		hwts->hwtstamp = timespec_to_ktime(ts);
 		skb_tstamp_tx(skb, hwts);
 	}
+	printk("%s: stamped slot %i, %x, %p\n", __func__, i, frame_id, skb);
 	dev_kfree_skb_irq(skb);
 	wrn->skb_desc[i].skb = 0;
 	return 0;

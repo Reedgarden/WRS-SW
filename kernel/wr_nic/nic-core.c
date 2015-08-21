@@ -205,6 +205,7 @@ static int wrn_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 	wrn->skb_desc[desc].skb = skb; /* Save for tx irq and stamping */
 	wrn->skb_desc[desc].frame_id = id; /* Save for tx irq and stamping */
+	printk("%s: slot %i, %x, %p\n", __func__, desc, id, skb);
 
 	//netif_stop_queue(dev); /* Queue stopped until tx is over (FIXME?) */
 
