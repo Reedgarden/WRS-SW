@@ -98,7 +98,7 @@ static int hal_port_init(int index)
 
 	/* read dot-config values for this index, starting from name */
 	error = libwr_cfg_convert2("PORT%02i_PARAMS", "name", LIBWR_STRING,
-				   name, index);
+				   name, index + 1);
 	if (error)
 		return -1;
 	strncpy(p->name, name, 16);
@@ -112,23 +112,26 @@ static int hal_port_init(int index)
 
 	val = 18 * 800; /* magic default from previous code */
 	error = libwr_cfg_convert2("PORT%02i_PARAMS", "tx", LIBWR_INT,
-				   &val, index);
+				   &val, index + 1);
 	if (error)
-		pr_error("port index %i (%s): no \"tx=\" specified\n",
-			index, name);
+		pr_error("port %i (%s): no \"tx=\" specified\n",
+			index + 1, name);
 	p->calib.phy_tx_min = val;
 
 	val = 18 * 800; /* magic default from previous code */
 	error = libwr_cfg_convert2("PORT%02i_PARAMS", "rx", LIBWR_INT,
-				   &val, index);
+				   &val, index + 1);
 	if (error)
-		pr_error("port index %i (%s): no \"rx=\" specified\n",
-			index, name);
+		pr_error("port %i (%s): no \"rx=\" specified\n",
+			index + 1, name);
 	p->calib.phy_rx_min = val;
 
 	p->calib.delta_tx_board = 0; /* never set */
 	p->calib.delta_rx_board = 0; /* never set */
-	sscanf(p->name + 2, "%d", &p->hw_index);
+	/* get the number of a port from notation wriX */
+	sscanf(p->name + 3, "%d", &p->hw_index);
+	/* hw_index is 0..17, p->name wri1..18 */
+	p->hw_index--;
 
 	p->t2_phase_transition = DEFAULT_T2_PHASE_TRANS;
 	p->t4_phase_transition = DEFAULT_T4_PHASE_TRANS;
@@ -148,36 +151,36 @@ static int hal_port_init(int index)
 		strcpy(s, "non-wr"); /* default if no string passed */
 		p->mode = HEXP_PORT_MODE_NON_WR;
 		error = libwr_cfg_convert2("PORT%02i_PARAMS", "role",
-					   LIBWR_STRING, s, index);
+					   LIBWR_STRING, s, index + 1);
 		if (error)
-			pr_error("port index %i (%s): "
-				"no \"role=\" specified\n", index, name);
+			pr_error("port %i (%s): "
+				"no \"role=\" specified\n", index + 1, name);
 
 		for (rp = rt; rp->name; rp++)
 			if (!strcasecmp(s, rp->name))
 				break;
 		p->mode = rp->value;
 		if (!rp->name)
-			pr_error("port index %i (%s): invalid role "
-				"\"%s\" specified\n", index, name, s);
+			pr_error("port %i (%s): invalid role "
+				"\"%s\" specified\n", index + 1, name, s);
 
 		pr_debug("Port %s: mode %i\n", p->name, val);
 	}
 
 	/* Get fiber type */
 	error = libwr_cfg_convert2("PORT%02i_PARAMS", "fiber",
-				   LIBWR_INT, &p->fiber_index, index);
+				   LIBWR_INT, &p->fiber_index, index + 1);
 
 	if (error) {
-		pr_error("port index %i (%s): "
+		pr_error("port %i (%s): "
 			"no \"fiber=\" specified, default fiber to 0\n",
-			index, name);
+			index + 1, name);
 		p->fiber_index = 0;
 		}
 	if (p->fiber_index > 3) {
-		pr_error("port index %i (%s): "
+		pr_error("port %i (%s): "
 			"not supported \"fiber=\" value, default to 0\n",
-			index, name);
+			index + 1, name);
 		p->fiber_index = 0;
 		}
 
@@ -230,6 +233,7 @@ int hal_port_init_all(char *logfilename)
 	for (index = 0; index < HAL_MAX_PORTS; index++)
 		if (hal_port_init(index) < 0)
 			break;
+
 	hal_port_nports = index;
 
 	pr_info("Number of physical ports supported in HW: %d\n",
