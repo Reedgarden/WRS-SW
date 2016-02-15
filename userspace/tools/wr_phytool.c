@@ -297,7 +297,7 @@ void calc_trans(int ep, int argc, char *argv[])
 	if(argc >= 3)
 		f_log = fopen(argv[3], "wb");
 
-	snprintf(sock_addr.if_name, sizeof(sock_addr.if_name), "wr%d", ep);
+	snprintf(sock_addr.if_name, sizeof(sock_addr.if_name), "wri%d", ep);
 	sock_addr.family = PTPD_SOCK_RAW_ETHERNET; // socket type
 	sock_addr.ethertype = 12345;
 	memset(sock_addr.mac, 0xff, 6);
@@ -425,7 +425,7 @@ void pps_adjustment_test(int ep, int argc, char *argv[])
 
 	signal (SIGINT, sighandler);
 
-	snprintf(sock_addr.if_name, sizeof(sock_addr.if_name), "wr%d", ep);
+	snprintf(sock_addr.if_name, sizeof(sock_addr.if_name), "wri%d", ep);
 	sock_addr.family = PTPD_SOCK_RAW_ETHERNET; // socket type
 	sock_addr.ethertype = 12345;
 	memset(sock_addr.mac, 0xff, 6);
@@ -487,7 +487,8 @@ void rt_command(int ep, int argc, char *argv[])
 		       hal_nports_local);
 		printf("CurrentRef: %d Mode: %d Flags: %x\n", pstate.current_ref, pstate.mode, pstate.flags);
 		for (i = 0; i < hal_nports_local; i++)
-			printf("wr%-2d: setpoint: %-8dps current: %-8dps loopback: %-8dps flags: %x\n", i,
+			printf("wri%-2d: setpoint: %-8dps current: %-8dps "
+			       "loopback: %-8dps flags: %x\n", i + 1,
 			       pstate.channels[i].phase_setpoint,
 			       pstate.channels[i].phase_current,
 			       pstate.channels[i].phase_loopback,
@@ -514,7 +515,7 @@ void rt_command(int ep, int argc, char *argv[])
 	}
 	else if (!strcmp(argv[3], "track"))
 	{
-		printf("Enabling ptracker @ port %d\n", ep);
+		printf("Enabling ptracker @ port %d (wri%d)\n", ep + 1, ep + 1);
 
 		rts_enable_ptracker(ep, 1);
 	}
