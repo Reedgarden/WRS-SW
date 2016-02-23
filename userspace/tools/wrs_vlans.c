@@ -113,6 +113,10 @@ static int parse_mask(char *arg, unsigned long *pmask)
 		default:
 			return -1;
 		}
+		/* --ep should be from the range 1..18,
+		 * but internally we use 0..17 */
+		p1--;
+		p2--;
 		if ((p1 > p2) || (p1 < 0) || (p2 >= NPORTS))
 			return -1;
 		for (; p1 <= p2; p1++) {
@@ -123,9 +127,9 @@ static int parse_mask(char *arg, unsigned long *pmask)
 	if (!debug)
 		return 0;
 
-	fprintf(stderr, "%s: working on ports:", prgname);
+	fprintf(stderr, "%s: working on ports:\n", prgname);
 	iterate_ports(p1, *pmask)
-		printf(" %i", p1);
+		printf(" %i", p1 + 1);
 	printf("\n");
 	return 0;
 }
@@ -322,7 +326,7 @@ int main(int argc, char *argv[])
 
 static int print_help(char *prgname)
 {
-	fprintf(stderr, "Use: %s [--ep <port number> <EP options> --ep <port number> "
+	fprintf(stderr, "Use: %s [--ep <port number 1..18> <EP options> --ep <port number> "
 			"<EP options> ...] [--rvid <vid> --rfid <fid> --rmask <mask> --rdrop "
 			"--rprio <prio> --rvid <vid>...] [--debug]\n", prgname);
 
@@ -343,7 +347,7 @@ static int print_help(char *prgname)
 			"\t --rfid <fid>        assign <fid> to configured VLAN\n"
 			"\t --rmask <hex mask>  ports belonging to configured VLAN\n"
 			"\t --rdrop <1/0>       drop/don't drop frames on VLAN\n"
-			"\t --rprio <prio>      force priority for VLAN (-1 cancels priority override\n"
+			"\t --rprio <prio>      force priority for VLAN (-1 cancels priority override)\n"
 			"Other options:\n"
 			"\t --clear  clears RTUd VLAN table\n"
 			"\t --list   prints the content of RTUd VLAN table\n"
@@ -359,10 +363,17 @@ static void print_config(struct s_port_vlans *vlans)
 	for_each_port(i) {
 		printf("port: %d, qmode: %d, qmode_valid: %d, fix_prio: %d, prio_val: %d, "
 		       "prio_valid: %d, vid: %d, vid_valid: %d, untag_mask: 0x%X, untag_valid: %d\n",
-		       i, vlans[i].qmode, ((vlans[i].valid_mask & VALID_QMODE) != 0), vlans[i].fix_prio,
-		       vlans[i].prio_val, ((vlans[i].valid_mask & VALID_PRIO) != 0),vlans[i].vid,
-		       ((vlans[i].valid_mask & VALID_VID) != 0), vlans[i].untag_mask,
-		       ((vlans[i].valid_mask & VALID_UNTAG) != 0) );
+		       i + 1,
+		       vlans[i].qmode,
+		       ((vlans[i].valid_mask & VALID_QMODE) != 0),
+		       vlans[i].fix_prio,
+		       vlans[i].prio_val,
+		       ((vlans[i].valid_mask & VALID_PRIO) != 0),
+		       vlans[i].vid,
+		       ((vlans[i].valid_mask & VALID_VID) != 0),
+		       vlans[i].untag_mask,
+		       ((vlans[i].valid_mask & VALID_UNTAG) != 0)
+		       );
 	}
 }
 
@@ -507,13 +518,13 @@ static void list_ep_vlans(void)
 	int ep;
 	static char *names[] = {"ACCESS", "TRUNK", "disabled", "unqualified"};
 
-	printf("#      QMODE    FIX_PRIO  PRIO    PVID     MAC\n");
-	printf("#---------------------------------------------\n");
+	printf("#        QMODE    FIX_PRIO  PRIO    PVID     MAC\n");
+	printf("#-----------------------------------------------\n");
 	for (ep = 0; ep < NPORTS; ep++) {
 		r = offsetof(struct EP_WB, VCR0);
 		v = ep_read(ep, r);
-		printf(" %2i    %i %6.6s     %i      %i     %4i    %04x%08x\n",
-		       ep, v & 3, names[v & 3],
+		printf("wri%-2i    %i %6.6s     %i      %i     %4i    %04x%08x\n",
+		       ep + 1, v & 3, names[v & 3],
 		       v & EP_VCR0_FIX_PRIO ? 1 : 0,
 		       EP_VCR0_PRIO_VAL_R(v),
 		       EP_VCR0_PVID_R(v),
