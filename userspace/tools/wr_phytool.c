@@ -468,6 +468,8 @@ void pps_adjustment_test(int ep, int argc, char *argv[])
 
 void rt_command(int ep, int argc, char *argv[])
 {
+/* ep is 0..17 */
+
 	struct rts_pll_state pstate;
 	int i;
 
@@ -476,7 +478,7 @@ void rt_command(int ep, int argc, char *argv[])
 	if(	rts_connect(NULL) < 0)
 	{
 		printf("Can't connect to the RT subsys\n");
-		return;
+		exit(1);
 	}
 
 	rts_get_state(&pstate);
@@ -581,6 +583,7 @@ struct {
 int main(int argc, char **argv)
 {
 	int i;
+	int ep;
 
 	wrs_msg_init(1, argv); /* only use argv[0]: no cmdline */
 
@@ -602,7 +605,14 @@ int main(int argc, char **argv)
 	for(i=0; commands[i].cmd;i++)
 		if(!strcmp(commands[i].cmd, argv[2]))
 		{
-			commands[i].func(atoi(argv[1]), argc, argv);
+			/* first parameter is an enpoint number 1..18 */
+			ep = atoi(argv[1]) - 1;
+			if (ep < 0) {
+				printf("Wrong endpoint number %d\n", ep + 1);
+				exit(1);
+			}
+			/* pass endpoint as number 0..17 */
+			commands[i].func(ep, argc, argv);
 			return 0;
 		}
 
