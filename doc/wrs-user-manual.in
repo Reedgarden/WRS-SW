@@ -635,7 +635,7 @@ value is changed by the web interface, proper action is taken.
 
 	By default, PPSi configuration file is assembled based on role and
         protocol parameters stored in @t{PORTxx_PARAMS}. @t{TIME_BC} selected
-        by @i{Kconfig} defaults role of port @t{wr0} to slave, other ports
+        by @i{Kconfig} defaults role of port @t{wri1} to slave, other ports
         to master. For @t{TIME_GM} and @t{TIME_FM} all ports are mandated to
         master.
         Parameters @t{clock-class} and @t{clock-accuracy} can be changed
@@ -1397,12 +1397,12 @@ VLAN configuration of the switch:
 
 @i{wrs_vlans} tool can be called multiple times to make a set of per-port and
 per-VLAN configurations. However, it is also possible to configure multiple
-ports/VLANs in one go. For example to configure ports 0,1,2,5 to VLAN 5 and
-ports 3,4 to VLAN 6 with tagging ingress frames one could call @i{wrs_vlans}
+ports/VLANs in one go. For example to configure ports 1,2,3,6 to VLAN 5 and
+ports 4,5 to VLAN 6 with tagging ingress frames one could call @i{wrs_vlans}
 with these parameters:
 
 @example
-  wrs_vlans --ep 0-2,5 --emode 0 --evid 5 --ep 3,4 --emode 0 --evid 6 \
+  wrs_vlans --ep 1-3,6 --emode 0 --evid 5 --ep 4,5 --emode 0 --evid 6 \
     --rvid 5 --rmask 0x27 --rvid 6 --rmask 0x18
 @end example
 
@@ -1551,8 +1551,8 @@ WR-SWITCH-MIB::wrsPtpRTT.1 = Counter64: 943893
 WR-SWITCH-MIB::wrsPtpLinkLength.1 = Gauge32: 91
 WR-SWITCH-MIB::wrsPtpServoUpdates.1 = Counter32: 33
 [...]
-WR-SWITCH-MIB::wrsPortStatusPortName.1 = STRING: wr0
-WR-SWITCH-MIB::wrsPortStatusPortName.2 = STRING: wr1
+WR-SWITCH-MIB::wrsPortStatusPortName.1 = STRING: wri1
+WR-SWITCH-MIB::wrsPortStatusPortName.2 = STRING: wri2
 [...]
 WR-SWITCH-MIB::wrsPortStatusLink.1 = INTEGER: up(2)
 WR-SWITCH-MIB::wrsPortStatusLink.2 = INTEGER: up(2)
@@ -1566,8 +1566,8 @@ WR-SWITCH-MIB::wrsPortStatusSfpVN.2 = STRING: Axcen Photonics
 WR-SWITCH-MIB::wrsPortStatusSfpPN.1 = STRING: AXGE-3454-0531
 WR-SWITCH-MIB::wrsPortStatusSfpPN.2 = STRING: AXGE-3454-0531
 [...]
-WR-SWITCH-MIB::wrsPstatsHCPortName.1 = STRING: wr0
-WR-SWITCH-MIB::wrsPstatsHCPortName.2 = STRING: wr1
+WR-SWITCH-MIB::wrsPstatsHCPortName.1 = STRING: wri1
+WR-SWITCH-MIB::wrsPstatsHCPortName.2 = STRING: wri2
 [...]
 WR-SWITCH-MIB::wrsPstatsHCTXFrames.1 = Counter64: 232
 WR-SWITCH-MIB::wrsPstatsHCTXFrames.2 = Counter64: 543
@@ -1618,47 +1618,47 @@ Output is in text form and looks like:
 @smallexample
 SNMP table: WR-SWITCH-MIB::wrsPstatsHCTable
 
- wrsPstatsHCPortName wrsPstatsHCTXUnderrun wrsPstatsHCRXOverrun wrsPstatsHCRXInvalidCode
-                 wr0                     0                    0                        0
-                 wr1                     0                    0                        0
-                 wr2                     0                    0                        0
-                 wr3                     0                    0                        0
-                 wr4                     0                    0                        0
-                 wr5                     0                    0                        0
-                 wr6                     0                    0                        0
-                 wr7                     0                    0                        0
-                 wr8                     0                    0                        0
-                 wr9                     0                    0                        0
-                wr10                     0                    0                        0
-                wr11                     0                    0                        0
-                wr12                     0                    0                        0
-                wr13                     0                    0                        0
-                wr14                     0                    0                        0
-                wr15                     0                    0                        0
-                wr16                     0                    0                        0
-                wr17                     0                    0                        0
+ wrsPstatsHCPortName wrsPstatsHCTXUnderrun wrsPstatsHCRXOverrun
+                wri1                     0                    0
+                wri2                     0                    0
+                wri3                     0                    0
+                wri4                     0                    0
+                wri5                     0                    0
+                wri6                     0                    0
+                wri7                     0                    0
+                wri8                     0                    0
+                wri9                     0                    0
+               wri10                     0                    0
+               wri11                     0                    0
+               wri12                     0                    0
+               wri13                     0                    0
+               wri14                     0                    0
+               wri15                     0                    0
+               wri16                     0                    0
+               wri17                     0                    0
+               wri18                     0                    0
 
 SNMP table WR-SWITCH-MIB::wrsPstatsHCTable, part 2
 
- wrsPstatsHCRXSyncLost wrsPstatsHCRXPauseFrames wrsPstatsHCRXPfilterDropped
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
-                     0                        0                           0
+ wrsPstatsHCRXInvalidCode wrsPstatsHCRXSyncLost wrsPstatsHCRXPauseFrames
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
+                        0                     0                        0
 
 (...)
 @end smallexample
