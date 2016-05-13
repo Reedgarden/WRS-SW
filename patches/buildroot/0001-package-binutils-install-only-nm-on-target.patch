@@ -1,0 +1,32 @@
+From f8c23d8471afa547f169bcf43c879ebe793188cc Mon Sep 17 00:00:00 2001
+From: Adam Wujek <adam.wujek@cern.ch>
+Date: Fri, 13 May 2016 16:55:34 +0200
+Subject: [PATCH] package/binutils: install only nm on target
+
+We don't need other binaries from the binutils package for wr-switch.
+Library needed by the nm (libbfd-2.24.so) is installed when BR2_PACKAGE_BINUTILS
+is selected in buildroot's config.
+
+Signed-off-by: Adam Wujek <adam.wujek@cern.ch>
+---
+ package/binutils/binutils.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/package/binutils/binutils.mk b/package/binutils/binutils.mk
+index ca39f0b..bde1e65 100644
+--- a/package/binutils/binutils.mk
++++ b/package/binutils/binutils.mk
+@@ -95,8 +95,8 @@ endef
+ # If we don't want full binutils on target
+ ifneq ($(BR2_PACKAGE_BINUTILS_TARGET),y)
+ define BINUTILS_INSTALL_TARGET_CMDS
+-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)/bfd DESTDIR=$(TARGET_DIR) install
+-	$(MAKE) -C $(@D)/libiberty DESTDIR=$(STAGING_DIR) install
++# install only nm
++	$(INSTALL) -m 755 $(@D)/binutils/nm-new $(TARGET_DIR)/usr/bin/nm
+ endef
+ endif
+ 
+-- 
+1.9.1
+
